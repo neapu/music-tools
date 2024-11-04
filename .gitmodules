@@ -1,0 +1,6 @@
+[submodule "cpp/logger"]
+	path = cpp/logger
+	url = https://github.com/neapu/logger.git
+[submodule "cpp/json"]
+	path = cpp/json
+	url = https://github.com/nlohmann/json.git
