@@ -6,8 +6,12 @@ import { fileManager } from './FileManager'
 
 function createWindow(): void {
   // Create the browser window.
+  let windowWidth = 1200;
+  if (is.dev) {
+    windowWidth = 1600;
+  }
   const mainWindow = new BrowserWindow({
-    width: 1600,
+    width: windowWidth,
     height: 670,
     show: false,
     autoHideMenuBar: true,

@@ -21,8 +21,8 @@
     "build:mac": "npm run build && electron-builder --mac",
     "build:linux": "npm run build && electron-builder --linux",
     "build:cpp": "npm run conan:install && npm run cmake-js:build && cpr build/Release/addon.node resources/addon.node -o",
-    "cmake-js:build": "cmake-js build --CDCMAKE_TOOLCHAIN_FILE=generators/conan_toolchain.cmake  --CDCMAKE_POLICY_DEFAULT_CMP0091=NEW",
-    "conan:install": "conan install . --build=missing"
+    "cmake-js:build": "cmake-js build --CDCMAKE_TOOLCHAIN_FILE=Release/generators/conan_toolchain.cmake  --CDCMAKE_POLICY_DEFAULT_CMP0091=NEW",
+    "conan:install": "conan install . --build=missing -s build_type=Release"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.0",
