@@ -3,6 +3,7 @@ import Ffmpeg from 'fluent-ffmpeg'
 import path from 'path'
 import { loadMusicMetadata } from 'music-metadata'
 import fs from 'fs'
+import addon from '../../resources/addon.node'
 
 export interface FileItem {
   name: string
@@ -12,6 +13,7 @@ export interface FileItem {
 }
 
 export interface EncoderConfig {
+  outputDir: string,
   targetFormat: string
 }
 
@@ -20,7 +22,7 @@ interface AudioMetadata {
   artist: string
   album: string
   // year: string
-  track: string
+  // track: string
   // genre: string
 }
 
@@ -40,9 +42,9 @@ class FileManager {
     })
 
     ipcMain.handle('convert', async (_event, param) => {
-      const { config, files, outputPath } = JSON.parse(param)
+      const { config, files } = JSON.parse(param)
       try {
-        await fileManager.convertFormat(config, files, outputPath)
+        await fileManager.convertFormat(config, files)
         return true
       } catch (err) {
         console.error(err)
@@ -60,20 +62,33 @@ class FileManager {
 
     ipcMain.handle('modify-metadata', async (_event, param) => {
       const { file } = JSON.parse(param)
-      try {
-        return await fileManager.modifyMetadata(file)
-      } catch (err) {
-        console.error(err)
-        return false
-      }
+      // try {
+      //   return await fileManager.modifyMetadata(file)
+      // } catch (err) {
+      //   console.error(err)
+      //   return false
+      // }
+      console.log(file);
+      return addon.setAudioMetadataTags(file.path, file.metadata);
     })
 
     ipcMain.handle('read-file-metadata', async (_event, param) => {
+      // try {
+      //   return await fileManager.readFileMetadata(param)
+      // } catch (err) {
+      //   console.error(err)
+      //   return null
+      // }'
+      return addon.getAudioMetadataTags(param);
+    })
+
+    ipcMain.handle('reaname-file', async (_event, src, dst) => {
       try {
-        return await fileManager.readFileMetadata(param)
+        fs.renameSync(src, dst);
+        return true;
       } catch (err) {
-        console.error(err)
-        return null
+        console.error(err);
+        return false;
       }
     })
 
@@ -107,7 +122,8 @@ class FileManager {
     for (const filePath of result.filePaths) {
       const fileName = filePath.split(separator).pop() as string
       try {
-        const metadata = await this.readFileMetadata(filePath)!
+        // const metadata = await this.readFileMetadata(filePath)!
+        const metadata = addon.getAudioMetadataTags(filePath)!
         fileList.push({
           name: fileName,
           path: filePath,
@@ -138,10 +154,10 @@ class FileManager {
     })
   }
 
-  async convertFormat(config: EncoderConfig, files: FileItem[], outPath: string): Promise<void> {
+  async convertFormat(config: EncoderConfig, files: FileItem[]): Promise<void> {
     for (const file of files) {
       const outputFileName = file.name.replace(/\.[^/.]+$/, `.${config.targetFormat}`)
-      const savePath = path.join(outPath, outputFileName)
+      const savePath = path.join(config.outputDir, outputFileName)
       console.log(`Converting ${file.path} to ${savePath}`)
       this._stateChangedCallback?.(file.name, FileState.CONVERTING)
       try {
@@ -179,7 +195,7 @@ class FileManager {
           .outputOption('-metadata', `title=${file.metadata.title}`)
           .outputOption('-metadata', `artist=${file.metadata.artist}`)
           .outputOption('-metadata', `album=${file.metadata.album}`)
-          .outputOption('-metadata', `track=${file.metadata.track}`)
+          // .outputOption('-metadata', `track=${file.metadata.track}`)
           .run()
     })
   }
@@ -202,7 +218,7 @@ class FileManager {
         artist: audioMetadata.common.artist || '',
         album: audioMetadata.common.album || '',
         // year: audioMetadata.common.year?.toString() || '',
-        track: this.trackToString(audioMetadata.common.track.no, audioMetadata.common.track.of),
+        // track: this.trackToString(audioMetadata.common.track.no, audioMetadata.common.track.of),
         // genre: audioMetadata.common.genre?.at(0) || '',
     }
   }

@@ -1,6 +1,6 @@
-[submodule "cpp/logger"]
-	path = cpp/logger
-	url = https://github.com/neapu/logger.git
-[submodule "cpp/json"]
-	path = cpp/json
-	url = https://github.com/nlohmann/json.git
+[submodule "first-party/logger"]
+	path = first-party/logger
+	url = git@github.com:neapu/logger.git
+[submodule "first-party/LibAudio"]
+	path = first-party/LibAudio
+	url = git@github.com:neapu/LibAudio.git
