@@ -17,12 +17,12 @@
     "build": "npm run typecheck && electron-vite build",
     "postinstall": "electron-builder install-app-deps",
     "build:unpack": "npm run build && electron-builder --dir",
-    "build:win": "npm run build && electron-builder --win",
+    "build:win": "npm run build:cpp && npm run build && electron-builder --win",
     "build:mac": "npm run build && electron-builder --mac",
     "build:linux": "npm run build && electron-builder --linux",
     "build:cpp": "npm run conan:install && npm run cmake-js:build && cpr build/Release/addon.node resources/addon.node -o",
-    "cmake-js:build": "cmake-js build --CDCMAKE_TOOLCHAIN_FILE=build/build/Release/generators/conan_toolchain.cmake  --CDCMAKE_POLICY_DEFAULT_CMP0091=NEW",
-    "conan:install": "conan install . --output-folder=build --build=missing"
+    "cmake-js:build": "cmake-js build --CDCMAKE_TOOLCHAIN_FILE=generators/conan_toolchain.cmake  --CDCMAKE_POLICY_DEFAULT_CMP0091=NEW",
+    "conan:install": "conan install . --build=missing"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.0",
@@ -57,8 +57,5 @@
     "vite": "^5.3.1",
     "vue": "^3.4.30",
     "vue-tsc": "^2.0.22"
-  },
-  "cmake-js": {
-    "arch": "x86-64"
   }
 }
